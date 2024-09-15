@@ -103,7 +103,7 @@ class GeneralInfos(FlaskForm):
     app_id = StringField(
         _("Application identifier (id)"),
         description=_("Small caps and without spaces"),
-        validators=[DataRequired(), Regexp("[a-z_1-9]+.*(?<!_ynh)$")],
+        validators=[DataRequired(), Regexp(r"[a-z_1-9]+.*(?<!_ynh)$")],
         render_kw={
             "placeholder": "my_super_app",
         },
@@ -139,7 +139,7 @@ class IntegrationInfos(FlaskForm):
     # TODO : people shouldnt have to put the ~ynh1 ? This should be added automatically when rendering the app files ?
     version = StringField(
         _("Version"),
-        validators=[Regexp("\d{1,4}.\d{1,4}(.\d{1,4})?(.\d{1,4})?~ynh\d+")],
+        validators=[Regexp(r"\d{1,4}.\d{1,4}(.\d{1,4})?(.\d{1,4})?~ynh\d+")],
         render_kw={"placeholder": "1.0~ynh1"},
     )
 
