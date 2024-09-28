@@ -7,8 +7,6 @@
 {% endif %}
 
 #=================================================
-# GENERIC START
-#=================================================
 # IMPORT GENERIC HELPERS
 #=================================================
 
@@ -16,78 +14,53 @@ source _common.sh
 source /usr/share/yunohost/helpers
 
 {% if data.generator_mode == 'tutorial' -%}
-# Settings are automatically loaded as bash variables
-# in every app script context, therefore typically these will exist:
-# - $domain
-# - $path
-# - $language
-# - $install_dir
-# - $port
-# ...
+### Settings are automatically loaded as bash variables
+### in every app script context, therefore typically these will exist:
+### - $domain
+### - $path
+### - $language
+### - $install_dir
+### - $port
+### ...
 
-# In the context of upgrade,
-# - resources are automatically provisioned / updated / deleted (depending on existing resources)
-# - a safety backup is automatically created by the core and will be restored if the upgrade fails
-
-### This helper will compare the version of the currently installed app and the version of the upstream package.
-### $upgrade_type can have 2 different values
-### - UPGRADE_APP if the upstream app version has changed
-### - UPGRADE_PACKAGE if only the YunoHost package has changed
-### ynh_check_app_version_changed will stop the upgrade if the app is up to date.
-### UPGRADE_APP should be used to upgrade the core app only if there's an upgrade to do.
+### In the context of upgrade,
+### - resources are automatically provisioned / updated / deleted (depending on existing resources)
+### - a safety backup is automatically created by the core and will be restored if the upgrade fails
 {% endif %}
-upgrade_type=$(ynh_check_app_version_changed)
 
-#=================================================
-# STANDARD UPGRADE STEPS
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
 {% if data.generator_mode == 'tutorial' -%}
-#ynh_script_progression --message="Ensuring downward compatibility..."
+#ynh_script_progression "Ensuring downward compatibility..."
 
-#
-# N.B. : the followings setting migrations snippets are provided as *EXAMPLES*
-# of what you may want to do in some cases (e.g. a setting was not defined on
-# some legacy installs and you therefore want to initialize stuff during upgrade)
-#
+### N.B. : the following setting migration snippets are provided as *EXAMPLES*
+### of what you may want to do in some cases (e.g. a setting was not defined on
+### some legacy installs and you therefore want to initiaze stuff during upgrade)
 
 # If db_name doesn't exist, create it
-#if [ -z "${db_name:-}" ]; then
-#	db_name=$(ynh_sanitize_dbid --db_name=$app)
-#	ynh_app_setting_set --app=$app --key=db_name --value=$db_name
-#fi
+# ynh_app_setting_set_default --key=db_name --value="$(ynh_sanitize_dbid --db_name=$app)"
 
 # If install_dir doesn't exist, create it
-#if [ -z "${install_dir:-}" ]; then
-#	install_dir=/var/www/$app
-#	ynh_app_setting_set --app=$app --key=install_dir --value=$install_dir
-#fi
+# ynh_app_setting_set_default --key=install_dir --value="/var/www/$app"
 {% endif %}
 
 {% if data.main_technology not in ["php", "none"] -%}
 #=================================================
 # STOP SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Stopping a systemd service..."
+ynh_script_progression "Stopping a systemd service..."
 
-ynh_systemd_action --service_name=$app --action="stop" --log_path="/var/log/$app/$app.log"
+ynh_systemctl --service="$app" --action="stop"
 {% endif %}
 
 #=================================================
-# "REBUILD" THE APP (DEPLOY NEW SOURCES, RERUN NPM BUILD...)
-#=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
+ynh_script_progression --message="Upgrading source files..."
 
-if [ "$upgrade_type" == "UPGRADE_APP" ]
-then
-	ynh_script_progression --message="Upgrading source files..."
-
-	# Download, check integrity, uncompress and patch the source from app.src
-	ynh_setup_source --dest_dir="$install_dir" --full_replace=1  --keep=".env"
-	{{ data.custom_config_file }}
-fi
+ynh_setup_source --dest_dir="$install_dir" --full_replace  --keep=".env"
+{{ data.custom_config_file }}
 
 {% if data.generator_mode == 'tutorial' -%}
 # $install_dir will automatically be initialized with some decent
@@ -99,47 +72,44 @@ chown -R $app:www-data "$install_dir"
 #=================================================
 # REAPPLY SYSTEM CONFIGURATIONS
 #=================================================
-ynh_script_progression --message="Upgrading system configurations related to $app..."
+ynh_script_progression "Upgrading system configurations related to $app..."
 
 {% if data.generator_mode == 'tutorial' -%}
 # This should be a literal copypasta of what happened in the install's "System configuration" section
 {% endif %}
 
 {% if data.main_technology == "php" -%}
-ynh_add_fpm_config
+ynh_config_add_phpfpm
 {% endif %}
 
-ynh_add_nginx_config
+ynh_config_add_nginx
 
 {% if data.main_technology not in ["php", "none"] -%}
-ynh_add_systemd_config
+ynh_config_add_systemd
 
-yunohost service add $app --log="/var/log/$app/$app.log"
+yunohost service add "$app" --log="/var/log/$app/$app.log"
 {% endif %}
 
 {% if data.use_logrotate -%}
-ynh_use_logrotate --non-append
+ynh_config_add_logrotate
 {% endif %}
 
 {% if data.use_fail2ban -%}
-# Create a dedicated Fail2Ban config
-ynh_add_fail2ban_config --logpath="/var/log/nginx/${domain}-error.log" --failregex="{{ data.fail2ban_regex }}"
+ynh_config_add_fail2ban --logpath="/var/log/nginx/${domain}-error.log" --failregex="{{ data.fail2ban_regex }}"
 {% endif %}
 
 {% if data.use_cron -%}
 cron_path="/etc/cron.d/$app"
-ynh_add_config --template="../conf/task.cron" --destination="$cron_path"
+ynh_config_add --template="../conf/task.cron" --destination="$cron_path"
 chown root: "$cron_path"
 chmod 644 "$cron_path"
 {% endif %}
 
 {% if data.use_custom_config_file -%}
 #=================================================
-# RECONFIGURE THE APP (UPDATE CONF, APPLY MIGRATIONS...)
-#=================================================
 # UPDATE A CONFIG FILE
 #=================================================
-ynh_script_progression --message="Updating a configuration file..."
+ynh_script_progression "Updating a configuration file..."
 
 {% if data.generator_mode == 'tutorial' -%}
 ### Same as during install
@@ -148,7 +118,7 @@ ynh_script_progression --message="Updating a configuration file..."
 ### ynh_add_config keeps track of the file's checksum)
 {% endif %}
 
-ynh_add_config --template="{{ data.custom_config_file }}" --destination="$install_dir/{{ data.custom_config_file }}"
+ynh_config_add --template="{{ data.custom_config_file }}" --destination="$install_dir/{{ data.custom_config_file }}"
 
 {% if data.generator_mode == 'tutorial' -%}
 # FIXME: this should be handled by the core in the future
@@ -173,13 +143,13 @@ chown $app:$app "$install_dir/{{ data.custom_config_file }}"
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Starting a systemd service..."
+ynh_script_progression "Starting a systemd service..."
 
-ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"
+ynh_systemctl --service="$app" --action="start"
 {% endif %}
 
 #=================================================
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Upgrade of $app completed" --last
+ynh_script_progression "Upgrade of $app completed"

@@ -36,7 +36,7 @@ from wtforms.validators import (
     Length,
 )
 
-YOLOGEN_VERSION = "0.11"
+YOLOGEN_VERSION = "0.12"
 LANGUAGES = {"en": _("English"), "fr": _("French")}
 
 ###############################################################################

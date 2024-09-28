@@ -23,7 +23,8 @@ license = "{{ data.license }}"
 {% if data.code -%}code = "{{ data.code }}"{%- endif %}
 
 [integration]
-yunohost = '>= {{ data.yunohost_required_version or '11.2'}}'
+yunohost = '>= {{ data.yunohost_required_version or '11.2.30'}}'
+helpers_version = "2.1"
 {% if data.generator_mode == "tutorial" -%}
 # List of supported archs using the dpkg --print-architecture nomenclature (amd64/i386/armhf/arm64), for example: ["amd64", "i386']
 {% endif -%}
@@ -94,16 +95,8 @@ ram.runtime = "50M"
     [resources.sources]
 
         [resources.sources.main]
-        # This will pre-fetch the asset which can then be deployed during the install/upgrade scripts with :
-        #    ynh_setup_source --dest_dir="$install_dir"
-        # You can also define other assets than "main" and add --source_id="foobar" in the previous command
         url = "{{data.source_url}}"
         sha256 = "{{data.sha256sum}}"
-
-        # These infos are used by https://github.com/YunoHost/apps/blob/master/tools/autoupdate_app_sources/autoupdate_app_sources.py
-        # to auto-update the previous asset urls and sha256sum + manifest version
-        # assuming the upstream's code repo is on github and relies on tags or releases
-        # See the 'sources' resource documentation for more details
 
         {% if data.auto_update != "none" -%}
         autoupdate.strategy = "{{ data.auto_update }}"
@@ -172,7 +165,7 @@ ram.runtime = "50M"
     {%- if data.database != 'false' -%}
     [resources.database]
     {% if data.generator_mode == "tutorial" -%}
-    # This will automatically provision/deprovison a database and store the corresponding credentials in settings $db_user, $db_name, $db_pwd
+    # This will automatically provision/deprovision a database and store the corresponding credentials in settings $db_user, $db_name, $db_pwd
     {% endif -%}
     type = "{{ data.database }}"
     {%- endif -%}
