@@ -5,16 +5,10 @@
 # It contains extra commands to explain what should be done in case you want to adjust some part of the script.
 # Once you are done, you may remove them.
 {% endif %}
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
 
 source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
 
-#=================================================
-# DECLARE DATA AND CONF FILES TO BACKUP
-#=================================================
 ynh_print_info "Declaring files to be backed up..."
 
 {% if data.generator_mode == 'tutorial' -%}
@@ -35,9 +29,10 @@ ynh_backup "$install_dir"
 # BACKUP THE DATA DIR
 #=================================================
 {% if data.generator_mode == 'tutorial' -%}
-### Only relevant if there is a "data_dir" resource for this app
-# The --is_big parameters ensure this folder is not included in the backup by default (taking less space), except if BACKUP_CORE_ONLY=0 is passed before the backup command. You might want to document that for your users.
-# TODO : there should be an option for this
+# NB: $data_dir is not backuped during safety-backup-before-upgrades,
+# because the data dir may be huge and we don't want to just yolo-create a 10+ GB archive just for upgrades.
+# On the other hand, $data_dir is also *not* removed by default in the "app remove" step unless --purge is used
+# This means that even if the upgrade fails and the backup is restored, the data are still there.
 {% endif %}
 ynh_backup "$data_dir"
 {% endif %}
@@ -46,23 +41,23 @@ ynh_backup "$data_dir"
 # SYSTEM CONFIGURATION
 #=================================================
 
-ynh_backup --src_path="/etc/nginx/conf.d/$domain.d/$app.conf"
-
 {% if data.main_technology == "php" -%}
 ynh_backup "/etc/php/$phpversion/fpm/pool.d/$app.conf"
 {% endif %}
 
-{% if data.use_fail2ban -%}
-ynh_backup "/etc/fail2ban/jail.d/$app.conf"
-ynh_backup "/etc/fail2ban/filter.d/$app.conf"
+ynh_backup --src_path="/etc/nginx/conf.d/$domain.d/$app.conf"
+
+{% if data.main_technology not in ["php", "none"] -%}
+ynh_backup "/etc/systemd/system/$app.service"
 {% endif %}
 
 {% if data.use_logrotate -%}
 ynh_backup "/etc/logrotate.d/$app"
 {% endif %}
 
-{% if data.main_technology not in ["php", "none"] -%}
-ynh_backup "/etc/systemd/system/$app.service"
+{% if data.use_fail2ban -%}
+ynh_backup "/etc/fail2ban/jail.d/$app.conf"
+ynh_backup "/etc/fail2ban/filter.d/$app.conf"
 {% endif %}
 
 #=================================================
@@ -84,6 +79,11 @@ ynh_backup "/var/log/$app/" # TODO: add an option to specify log file
 # BACKUP THE DATABASE
 #=================================================
 ynh_print_info "Backing up the {{ data.database }} database..."
+
+{% if data.generator_mode == 'tutorial' -%}
+### (However, things like MySQL dumps *do* take some time to run, though the
+### copy of the generated dump to the archive still happens later)
+{% endif %}
 
 {% if data.use_db == 'mysql' -%}
 ynh_mysql_dump_db > db.sql
