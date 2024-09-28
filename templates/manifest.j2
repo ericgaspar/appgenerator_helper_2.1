@@ -96,7 +96,7 @@ ram.runtime = "50M"
 
         [resources.sources.main]
         url = "{{data.source_url}}"
-        sha256 = "{{data.sha256sum}}"
+        sha256 = "sha256sum"
 
         {% if data.auto_update != "none" -%}
         autoupdate.strategy = "{{ data.auto_update }}"

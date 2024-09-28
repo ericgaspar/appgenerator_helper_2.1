@@ -1,5 +1,7 @@
 import re
 import os
+import hashlib
+import urllib.request
 import logging
 import zipfile
 import random
@@ -310,7 +312,7 @@ class InstallQuestions(FlaskForm):
 
 
 # manifest
-class Ressources(FlaskForm):
+class Resources(FlaskForm):
 
     # Sources
     source_url = StringField(
@@ -318,13 +320,6 @@ class Ressources(FlaskForm):
         validators=[DataRequired(), URL()],
         render_kw={
             "placeholder": "https://github.com/foo/bar/archive/refs/tags/v1.2.3.tar.gz",
-        },
-    )
-    sha256sum = StringField(
-        _("Sources sha256 checksum"),
-        validators=[DataRequired(), Length(min=64, max=64)],
-        render_kw={
-            "placeholder": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
         },
     )
 
@@ -602,7 +597,7 @@ class GeneratorForm(
     IntegrationInfos,
     UpstreamInfos,
     InstallQuestions,
-    Ressources,
+    Resources,
     SpecificTechnology,
     AppConfig,
     Documentation,
@@ -637,6 +632,15 @@ class GeneratorForm(
         },
     )
 
+# SHA256 sum calculator
+def get_remote_sha256_sum(url):
+    remote = urllib.request.urlopen(url)
+    hash = hashlib.sha256()
+    while True:
+        data = remote.read(4096)
+        if not data: break
+        hash.update(data)
+    return hash.hexdigest()
 
 #### Web pages
 @app.route("/", methods=["GET", "POST"])
@@ -680,6 +684,7 @@ def main_form_route():
             AppFile("restore", "scripts/restore"),
             AppFile("upgrade", "scripts/upgrade"),
             AppFile("nginx", "conf/nginx.conf"),
+            AppFile("LICENSE", "LICENSE"),
         ]
 
         if main_form.enable_change_url.data:
@@ -717,6 +722,9 @@ def main_form_route():
             app_file.content = re.sub(r"\n\s+$", "\n", app_file.content, flags=re.M)
             app_file.content = re.sub(r"\n{3,}", "\n\n", app_file.content, flags=re.M)
 
+        source_url = main_form.source_url.data
+        app_files[0].content = re.sub(r"sha256sum", get_remote_sha256_sum(source_url), app_files[0].content)
+
         if main_form.use_custom_config_file.data:
             app_files.append(
                 AppFile("appconf", "conf/" + main_form.custom_config_file.data)
@@ -732,7 +740,7 @@ def main_form_route():
             f.seek(0)
             # Send the zip file to the user
             return send_file(
-                f, as_attachment=True, download_name=request.form["app_id"] + ".zip"
+                f, as_attachment=True, download_name=request.form["app_id"] + "_ynh.zip"
             )
 
     return render_template(
