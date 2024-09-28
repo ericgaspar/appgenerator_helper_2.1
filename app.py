@@ -483,7 +483,7 @@ class Documentation(FlaskForm):
         _(
             "doc/DESCRIPTION.md: A comprehensive presentation of the app, possibly listing the main features, possible warnings and specific details on its functioning in Yunohost (e.g. warning about integration issues)."
         ),
-        validators=[Optional()],
+        validators=[DataRequired()],
         render_kw={
             "spellcheck": "false",
         },
