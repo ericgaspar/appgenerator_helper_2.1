@@ -1,7 +1,8 @@
 #!/bin/bash
 ### App file generated with YoloGen, the YunoHost app generator, version {{ data['GENERATOR_VERSION'] }}.
 
-{% if data.generator_mode == 'tutorial' -%} # This is the tutorial version of the app.
+{% if data.generator_mode == 'tutorial' -%}
+# This is the tutorial version of the app.
 # It contains extra commands to explain what should be done in case you want to adjust some part of the script.
 # Once you are done, you may remove them.
 {% endif %}
@@ -49,6 +50,10 @@ ynh_psql_db_shell < ./db.sql
 #=================================================
 ynh_script_progression "Restoring system configurations related to $app..."
 
+{% if data.generator_mode == 'tutorial' -%}
+### This should be a symetric version of what happens in the install script
+{% endif %}
+
 {% if data.main_technology == "php" -%}
 ynh_restore "/etc/php/$phpversion/fpm/pool.d/$app.conf"
 {% endif %}
@@ -59,7 +64,7 @@ ynh_restore "/etc/nginx/conf.d/$domain.d/$app.conf"
 ynh_restore "/etc/systemd/system/$app.service"
 systemctl enable "$app.service" --quiet
 
-yunohost service add "$app" --log="/var/log/$app/$app.log"
+yunohost service add "$app"  --description="A short description of the app" --log="/var/log/$app/$app.log"
 {% endif %}
 
 {% if data.use_logrotate -%}
@@ -96,7 +101,6 @@ ynh_restore "/var/log/$app/" # TODO : add custom log file option
 #=================================================
 ynh_script_progression "Reloading NGINX web server and $app's service..."
 
-# Typically you only have either $app or php-fpm but not both at the same time...
 {% if data.main_technology not in ["php", "none"] -%}
 ynh_systemctl --service="$app" --action="start"
 {% endif %}
