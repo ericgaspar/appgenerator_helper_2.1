@@ -7,3 +7,8 @@
 {% if data.use_nodejs -%}
 nodejs_version={{ data.nodejs_version }}
 {% endif -%}
+
+{% if data.main_technology == "nodejs" -%}
+ynh_script_progression "Installing NodeJS..."
+nodejs_version={{ data.nodejs_version }}
+{% endif %}
