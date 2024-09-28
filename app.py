@@ -422,7 +422,7 @@ class SpecificTechnology(FlaskForm):
 
     nodejs_version = StringField(
         _("NodeJS version"),
-        description=_("For example: 16.4, 18, 18.2, 20, 20.1, ..."),
+        description=_("For example: 16.4, 18, 18.2, 20, 20.1..."),
         render_kw={
             "placeholder": "20",
         },
@@ -478,7 +478,7 @@ class Documentation(FlaskForm):
         _(
             "doc/DESCRIPTION.md: A comprehensive presentation of the app, possibly listing the main features, possible warnings and specific details on its functioning in Yunohost (e.g. warning about integration issues)."
         ),
-        validators=[Optional()],
+        validators=[DataRequired()],
         render_kw={
             "spellcheck": "false",
         },
