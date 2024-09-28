@@ -554,7 +554,7 @@ class MoreAdvanced(FlaskForm):
     # TODO : specify custom log file
     # custom_log_file = "/var/log/$app/$app.log" "/var/log/nginx/${domain}-error.log"
     use_fail2ban = BooleanField(
-        _("Protect the application against brute force attacks (via Fail2Ban)"),
+        _("Protect the application against brute force attacks (via fail2ban)"),
         default=False,
         render_kw={
             "title": _(
