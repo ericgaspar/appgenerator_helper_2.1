@@ -138,11 +138,10 @@ class GeneralInfos(FlaskForm):
 
 class IntegrationInfos(FlaskForm):
 
-    # TODO : people shouldnt have to put the ~ynh1 ? This should be added automatically when rendering the app files ?
     version = StringField(
         _("Version"),
-        validators=[Regexp(r"\d{1,4}.\d{1,4}(.\d{1,4})?(.\d{1,4})?~ynh\d+")],
-        render_kw={"placeholder": "1.0~ynh1"},
+        validators=[Regexp(r"\d{1,4}.\d{1,4}(.\d{1,4})?(.\d{1,4})?")],
+        render_kw={"placeholder": "1.0"},
     )
 
     maintainers = StringField(
