@@ -94,7 +94,7 @@ ynh_restore "/etc/cron.d/$app"
 ###
 ### For other apps, the simple way is better:
 {% endif %}
-ynh_restore "/var/log/$app/" # TODO : add custom log file option
+ynh_restore "/var/log/$app/"
 
 #=================================================
 # RELOAD NGINX AND PHP-FPM OR THE APP SERVICE
