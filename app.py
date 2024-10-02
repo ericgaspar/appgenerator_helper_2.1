@@ -153,7 +153,7 @@ class IntegrationInfos(FlaskForm):
         _("Minimal YunoHost version"),
         description=_("Minimal YunoHost version for the application to work"),
         render_kw={
-            "placeholder": "11.1.21",
+            "placeholder": "11.1.30",
         },
     )
 
@@ -449,7 +449,7 @@ class AppConfig(FlaskForm):
 
     use_custom_config_file = BooleanField(
         _("The app uses a specific configuration file"),
-        description=_("Usually : .env, config.json, conf.ini, params.yml, ..."),
+        description=_("Usually : .env, config.json, conf.ini, params.yml..."),
         default=False,
     )
 
@@ -475,7 +475,7 @@ class Documentation(FlaskForm):
     # TODO :    # screenshot
     description = TextAreaField(
         _(
-            "doc/DESCRIPTION.md: A comprehensive presentation of the app, possibly listing the main features, possible warnings and specific details on its functioning in Yunohost (e.g. warning about integration issues)."
+            "doc/DESCRIPTION.md: A comprehensive presentation of the app, possibly listing the main features, possible warnings and specific details on its functioning in YunoHost (e.g. warning about integration issues)."
         ),
         validators=[DataRequired()],
         render_kw={
@@ -538,7 +538,7 @@ class MoreAdvanced(FlaskForm):
         _("Handle app install URL change (change_url script)"),
         default=True,
         render_kw={
-            "title": _("Should changing the app URL be allowed ? (change_url change)")
+            "title": _("Should changing the app URL be allowed? (change_url change)")
         },
     )
 
@@ -554,7 +554,7 @@ class MoreAdvanced(FlaskForm):
     # TODO : specify custom log file
     # custom_log_file = "/var/log/$app/$app.log" "/var/log/nginx/${domain}-error.log"
     use_fail2ban = BooleanField(
-        _("Protect the application against brute force attacks (via fail2ban)"),
+        _("Protect the application against brute force attacks (via Fail2Ban)"),
         default=False,
         render_kw={
             "title": _(
@@ -577,14 +577,14 @@ class MoreAdvanced(FlaskForm):
     )
 
     fail2ban_regex = StringField(
-        _("Regular expression for fail2ban"),
+        _("Regular expression for Fail2Ban"),
         # Regex to match into the log for a failed login
         validators=[Optional()],
         render_kw={
             "placeholder": _("A regular expression"),
             "class": "form-control",
             "title": _(
-                "Regular expression to check in the log file to activate failban (search for a line that indicates a credentials error)."
+                "Regular expression to check in the log file to activate FailBan (search for a line that indicates a credentials error)."
             ),
         },
     )
