@@ -42,7 +42,7 @@ ynh_backup "$data_dir"
 #=================================================
 
 {% if data.main_technology == "php" -%}
-ynh_backup "/etc/php/$phpversion/fpm/pool.d/$app.conf"
+ynh_backup "/etc/php/$php_version/fpm/pool.d/$app.conf"
 {% endif %}
 
 ynh_backup --src_path="/etc/nginx/conf.d/$domain.d/$app.conf"

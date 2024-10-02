@@ -30,7 +30,7 @@ ynh_restore "$data_dir"
 
 {% if data.database -%}
 #=================================================
-# RESTORE THE MYSQL DATABASE
+# RESTORE THE APP DATABASE
 #=================================================
 {% if data.datase == 'mysql' -%}
 ynh_script_progression "Restoring the MySQL database..."
@@ -55,7 +55,7 @@ ynh_script_progression "Restoring system configurations related to $app..."
 {% endif %}
 
 {% if data.main_technology == "php" -%}
-ynh_restore "/etc/php/$phpversion/fpm/pool.d/$app.conf"
+ynh_restore "/etc/php/$php_version/fpm/pool.d/$app.conf"
 {% endif %}
 
 ynh_restore "/etc/nginx/conf.d/$domain.d/$app.conf"
@@ -64,7 +64,7 @@ ynh_restore "/etc/nginx/conf.d/$domain.d/$app.conf"
 ynh_restore "/etc/systemd/system/$app.service"
 systemctl enable "$app.service" --quiet
 
-yunohost service add "$app"  --description="A short description of the app" --log="/var/log/$app/$app.log"
+yunohost service add "$app" --description="A short description of the app" --log="/var/log/$app/$app.log"
 {% endif %}
 
 {% if data.use_logrotate -%}

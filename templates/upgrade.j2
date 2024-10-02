@@ -56,12 +56,12 @@ ynh_systemctl --service="$app" --action="stop"
 #=================================================
 ynh_script_progression --message="Upgrading source files..."
 
-ynh_setup_source --dest_dir="$install_dir" --full_replace  --keep=".env"
+ynh_setup_source --dest_dir="$install_dir" --full_replace --keep=""
 {{ data.custom_config_file }}
 
 {% if data.generator_mode == 'tutorial' -%}
 # $install_dir will automatically be initialized with some decent
-# permission by default ... however, you may need to recursively reapply
+# permission by default... however, you may need to recursively reapply
 # ownership to all files such as after the ynh_setup_source step
 {% endif %}
 chown -R $app:www-data "$install_dir"
