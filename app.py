@@ -715,14 +715,15 @@ def main_form_route():
             app_files.append(AppFile("ADMIN", "doc/ADMIN.md"))
 
         template_dir = os.path.dirname(__file__) + "/templates/"
+        
+        data = dict(request.form)
+        data["sha256sum"] = get_remote_sha256_sum(main_form.source_url.data)
+        
         for app_file in app_files:
             template = open(template_dir + app_file.id + ".j2").read()
-            app_file.content = render_template_string(template, data=dict(request.form))
+            app_file.content = render_template_string(template, data=data)
             app_file.content = re.sub(r"\n\s+$", "\n", app_file.content, flags=re.M)
             app_file.content = re.sub(r"\n{3,}", "\n\n", app_file.content, flags=re.M)
-
-        source_url = main_form.source_url.data
-        app_files[0].content = re.sub(r"sha256sum", get_remote_sha256_sum(source_url), app_files[0].content)
 
         if main_form.use_custom_config_file.data:
             app_files.append(
