@@ -180,7 +180,7 @@ class IntegrationInfos(FlaskForm):
     ldap = SelectField(
         _("The app will be integrating LDAP"),
         description=_(
-            "Which means it's possible to use Yunohost credentials to log into this app. 'LDAP' corresponds to the technology used by Yunohost to handle a centralised user base. Bridging the app and Yunohost's LDAP often requires to add the proper technical details in the app's configuration file"
+            "Which means it's possible to use YunoHost credentials to log into this app. LDAP corresponds to the technology used by YunoHost to handle a centralised user base. Bridging the app and YunoHost's LDAP often requires to add the proper technical details in the app's configuration file."
         ),
         choices=[
             ("false", _("No")),
@@ -191,7 +191,7 @@ class IntegrationInfos(FlaskForm):
         validators=[DataRequired()],
     )
     sso = SelectField(
-        _("The app will be integrated in Yunohost SSO (Single Sign On)"),
+        _("The app will be integrated in YunoHost SSO (Single Sign On)"),
         description=_(
             "Which means that people will be logged in the app after logging in YunoHost's portal, without having to sign on specifically into this app."
         ),
@@ -278,7 +278,7 @@ class InstallQuestions(FlaskForm):
     init_main_permission = BooleanField(
         _("Ask who can access to the app"),
         description=_(
-            "In the users groups : by default at least 'visitors', 'all_users' et 'admins' exists. (It was previously the private/public app concept)"
+            "In the users groups: by default at least 'visitors', 'all_users' et 'admins' exists."
         ),
         default=True,
     )
@@ -325,7 +325,7 @@ class Resources(FlaskForm):
     auto_update = SelectField(
         _("Enable automatic update of sources (using a bot running every night)"),
         description=_(
-            "If the upstream software is hosted in one of the handled sources and publishes proper releases or tags, the bot will create a pull request to update the sources URL and checksum"
+            "If the upstream software is hosted in one of the handled sources and publishes proper releases or tags, the bot will create a pull request to update the sources URL and checksum."
         ),
         default="none",
         choices=[
@@ -399,7 +399,7 @@ class SpecificTechnology(FlaskForm):
     install_snippet = TextAreaField(
         _("Installation specific commands"),
         description=_(
-            "These commands are executed from the app installation folder (by default, /var/www/$app) after the sources have been deployed. This field uses by default a classic example based on the selected technology. You should probably compare and adapt it according to the app installation documentation"
+            "These commands are executed from the app installation folder (by default, /var/www/$app) after the sources have been deployed. This field uses by default a classic example based on the selected technology. You should probably compare and adapt it according to the app installation documentation."
         ),
         validators=[Optional()],
         render_kw={"spellcheck": "false"},
@@ -475,7 +475,7 @@ class Documentation(FlaskForm):
     # TODO :    # screenshot
     description = TextAreaField(
         _(
-            "doc/DESCRIPTION.md: A comprehensive presentation of the app, possibly listing the main features, possible warnings and specific details on its functioning in YunoHost (e.g. warning about integration issues)."
+            "doc/DESCRIPTION.md: a comprehensive presentation of the app, possibly listing the main features, possible warnings and specific details on its functioning in YunoHost (e.g. warning about integration issues)."
         ),
         validators=[DataRequired()],
         render_kw={
@@ -484,7 +484,7 @@ class Documentation(FlaskForm):
     )
     pre_install = TextAreaField(
         _(
-            "doc/PRE_INSTALL.md: important info to be shown to the admin before installing the app"
+            "doc/PRE_INSTALL.md: important info to be shown to the admin before installing the app."
         ),
         description=_("Leave empty if not relevant"),
         validators=[Optional()],
@@ -494,7 +494,7 @@ class Documentation(FlaskForm):
     )
     post_install = TextAreaField(
         _(
-            "doc/POST_INSTALL.md: important info to be shown to the admin after installing the app"
+            "doc/POST_INSTALL.md: important info to be shown to the admin after installing the app."
         ),
         description=_("Leave empty if not relevant"),
         validators=[Optional()],
@@ -504,7 +504,7 @@ class Documentation(FlaskForm):
     )
     pre_upgrade = TextAreaField(
         _(
-            "doc/PRE_UPGRADE.md: important info to be shown to the admin before upgrading the app"
+            "doc/PRE_UPGRADE.md: important info to be shown to the admin before upgrading the app."
         ),
         description=_("Leave empty if not relevant"),
         validators=[Optional()],
@@ -514,7 +514,7 @@ class Documentation(FlaskForm):
     )
     post_upgrade = TextAreaField(
         _(
-            "doc/POST_UPGRADE.md: important info to be shown to the admin after upgrading the app"
+            "doc/POST_UPGRADE.md: important info to be shown to the admin after upgrading the app."
         ),
         description=_("Leave empty if not relevant"),
         validators=[Optional()],
