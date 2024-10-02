@@ -102,21 +102,12 @@ chown "$app:$app" "$install_dir/{{ data.custom_config_file }}"
 #=================================================
 ynh_script_progression "Adding system configurations related to $app..."
 
-{% if data.generator_mode == 'tutorial' -%}
-### `ynh_config_add_phpfpm` is used to set up a PHP config.
-### You can remove it if your app doesn't use PHP.
-### `ynh_config_add_phpfpm` will use the files conf/extra_php-fpm.conf
-### If you're not using these lines:
-###   - You can remove these files in conf/.
-###   - Remove the section "BACKUP THE PHP-FPM CONFIGURATION" in the backup script
-###   - Remove also the section "REMOVE PHP-FPM CONFIGURATION" in the remove script
-###   - As well as the section "RESTORE THE PHP-FPM CONFIGURATION" in the restore script
-###     with the reload at the end of the script.
-###   - And the section "PHP-FPM CONFIGURATION" in the upgrade script
-{% endif %}
-
 {% if data.main_technology == "php" -%}
 ynh_config_add_phpfpm
+{% endif %}
+
+{% if data.generator_mode == 'tutorial' -%}
+# Create a dedicated NGINX config using the conf/nginx.conf template
 {% endif %}
 
 ynh_config_add_nginx
@@ -127,12 +118,6 @@ ynh_config_add_nginx
 ### It can be used for apps that use sysvinit (with adaptation) or systemd.
 ### Have a look at the app to be sure this app needs a systemd script.
 ### `ynh_config_add_systemd` will use the file conf/systemd.service
-### If you're not using these lines:
-###   - You can remove those files in conf/.
-###   - Remove the section "BACKUP SYSTEMD" in the backup script
-###   - Remove also the section "STOP AND REMOVE SERVICE" in the remove script
-###   - As well as the section "RESTORE SYSTEMD" in the restore script
-###   - And the section "SETUP SYSTEMD" in the upgrade script
 {% endif %}
 ynh_config_add_systemd
 
@@ -140,11 +125,6 @@ ynh_config_add_systemd
 ### `yunohost service add` integrates a service in YunoHost. It then gets
 ### displayed in the admin interface and through the others `yunohost service` commands.
 ### (N.B.: this line only makes sense if the app adds a service to the system!)
-### If you're not using these lines:
-###   - You can remove these files in conf/.
-###   - Remove the section "REMOVE SERVICE INTEGRATION IN YUNOHOST" in the remove script
-###   - As well as the section "INTEGRATE SERVICE IN YUNOHOST" in the restore script
-###   - And the section "INTEGRATE SERVICE IN YUNOHOST" in the upgrade script
 
 ### Additional options starting with 3.8:
 ###
@@ -163,25 +143,7 @@ ynh_config_add_systemd
 ### service though so you should re-provide all relevant flags when doing so)
 {% endif %}
 yunohost service add "$app" --description="A short description of the app" --log="/var/log/$app/$app.log"
-
-{% if data.generator_mode == 'tutorial' -%}
-### Additional options starting with 3.8:
-###
-### --needs_exposed_ports "$port" a list of ports that needs to be publicly exposed
-###                               which will then be checked by YunoHost's diagnosis system
-###                               (N.B. DO NOT USE THIS if the port is only internal!!!)
-###
-### --test_status "some command"  a custom command to check the status of the service
-###                               (only relevant if 'systemctl status' doesn't do a good job)
-###
-### --test_conf "some command"    some command similar to "nginx -t" that validates the conf of the service
-###
-### Re-calling 'yunohost service add' during the upgrade script is the right way
-### to proceed if you later realize that you need to enable some flags that
-### weren't enabled on old installs (be careful it'll override the existing
-### service though so you should re-provide all relevant flags when doing so)
 {% endif -%}
-{% endif %}
 
 {% if data.use_logrotate %}
 ynh_config_add_logrotate
@@ -205,7 +167,7 @@ chmod 644 "$cron_path"
 ynh_script_progression "Installing $app..."
 
 pushd $install_dir
-  ynh_hide_warnings {{ data.install_snippet }}
+  {{ data.install_snippet }}
 popd
 {% endif %}
 
