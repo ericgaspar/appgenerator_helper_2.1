@@ -30,7 +30,7 @@ helpers_version = "2.1"
 {% endif -%}
 architectures = "{{ data.architectures }}"
 multi_instance = {{ "true" if data.multi_instance else "false" }}
-ldap = "{{ data.ldap }}"
+ldap = "{{ data.ldap }}" {# TODO : fixme, use actual booleans + handle the "not_relevant" value #}
 sso = "{{ data.sso }}"
 disk = "50M"
 ram.build = "50M"
