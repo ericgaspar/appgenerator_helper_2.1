@@ -1,5 +1,7 @@
 import re
 import os
+import hashlib
+import urllib.request
 import logging
 import zipfile
 import random
@@ -36,7 +38,7 @@ from wtforms.validators import (
     Length,
 )
 
-YOLOGEN_VERSION = "0.11"
+YOLOGEN_VERSION = "0.12"
 LANGUAGES = {"en": _("English"), "fr": _("French")}
 
 ###############################################################################
@@ -136,11 +138,10 @@ class GeneralInfos(FlaskForm):
 
 class IntegrationInfos(FlaskForm):
 
-    # TODO : people shouldnt have to put the ~ynh1 ? This should be added automatically when rendering the app files ?
     version = StringField(
         _("Version"),
-        validators=[Regexp(r"\d{1,4}.\d{1,4}(.\d{1,4})?(.\d{1,4})?~ynh\d+")],
-        render_kw={"placeholder": "1.0~ynh1"},
+        validators=[Regexp(r"\d{1,4}.\d{1,4}(.\d{1,4})?(.\d{1,4})?")],
+        render_kw={"placeholder": "1.0"},
     )
 
     maintainers = StringField(
@@ -152,7 +153,7 @@ class IntegrationInfos(FlaskForm):
         _("Minimal YunoHost version"),
         description=_("Minimal YunoHost version for the application to work"),
         render_kw={
-            "placeholder": "11.1.21",
+            "placeholder": "11.1.30",
         },
     )
 
@@ -179,7 +180,7 @@ class IntegrationInfos(FlaskForm):
     ldap = SelectField(
         _("The app will be integrating LDAP"),
         description=_(
-            "Which means it's possible to use Yunohost credentials to log into this app. 'LDAP' corresponds to the technology used by Yunohost to handle a centralised user base. Bridging the app and Yunohost's LDAP often requires to add the proper technical details in the app's configuration file"
+            "Which means it's possible to use YunoHost credentials to log into this app. LDAP corresponds to the technology used by YunoHost to handle a centralised user base. Bridging the app and YunoHost's LDAP often requires to add the proper technical details in the app's configuration file."
         ),
         choices=[
             ("false", _("No")),
@@ -190,7 +191,7 @@ class IntegrationInfos(FlaskForm):
         validators=[DataRequired()],
     )
     sso = SelectField(
-        _("The app will be integrated in Yunohost SSO (Single Sign On)"),
+        _("The app will be integrated in YunoHost SSO (Single Sign On)"),
         description=_(
             "Which means that people will be logged in the app after logging in YunoHost's portal, without having to sign on specifically into this app."
         ),
@@ -277,7 +278,7 @@ class InstallQuestions(FlaskForm):
     init_main_permission = BooleanField(
         _("Ask who can access to the app"),
         description=_(
-            "In the users groups : by default at least 'visitors', 'all_users' et 'admins' exists. (It was previously the private/public app concept)"
+            "In the users groups: by default at least 'visitors', 'all_users' et 'admins' exists."
         ),
         default=True,
     )
@@ -310,7 +311,7 @@ class InstallQuestions(FlaskForm):
 
 
 # manifest
-class Ressources(FlaskForm):
+class Resources(FlaskForm):
 
     # Sources
     source_url = StringField(
@@ -320,18 +321,11 @@ class Ressources(FlaskForm):
             "placeholder": "https://github.com/foo/bar/archive/refs/tags/v1.2.3.tar.gz",
         },
     )
-    sha256sum = StringField(
-        _("Sources sha256 checksum"),
-        validators=[DataRequired(), Length(min=64, max=64)],
-        render_kw={
-            "placeholder": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-        },
-    )
 
     auto_update = SelectField(
         _("Enable automatic update of sources (using a bot running every night)"),
         description=_(
-            "If the upstream software is hosted in one of the handled sources and publishes proper releases or tags, the bot will create a pull request to update the sources URL and checksum"
+            "If the upstream software is hosted in one of the handled sources and publishes proper releases or tags, the bot will create a pull request to update the sources URL and checksum."
         ),
         default="none",
         choices=[
@@ -405,7 +399,7 @@ class SpecificTechnology(FlaskForm):
     install_snippet = TextAreaField(
         _("Installation specific commands"),
         description=_(
-            "These commands are executed from the app installation folder (by default, /var/www/$app) after the sources have been deployed. This field uses by default a classic example based on the selected technology. You should probably compare and adapt it according to the app installation documentation"
+            "These commands are executed from the app installation folder (by default, /var/www/$app) after the sources have been deployed. This field uses by default a classic example based on the selected technology. You should probably compare and adapt it according to the app installation documentation."
         ),
         validators=[Optional()],
         render_kw={"spellcheck": "false"},
@@ -427,7 +421,7 @@ class SpecificTechnology(FlaskForm):
 
     nodejs_version = StringField(
         _("NodeJS version"),
-        description=_("For example: 16.4, 18, 18.2, 20, 20.1, ..."),
+        description=_("For example: 16.4, 18, 18.2, 20, 20.1..."),
         render_kw={
             "placeholder": "20",
         },
@@ -455,7 +449,7 @@ class AppConfig(FlaskForm):
 
     use_custom_config_file = BooleanField(
         _("The app uses a specific configuration file"),
-        description=_("Usually : .env, config.json, conf.ini, params.yml, ..."),
+        description=_("Usually : .env, config.json, conf.ini, params.yml..."),
         default=False,
     )
 
@@ -481,7 +475,7 @@ class Documentation(FlaskForm):
     # TODO :    # screenshot
     description = TextAreaField(
         _(
-            "doc/DESCRIPTION.md: A comprehensive presentation of the app, possibly listing the main features, possible warnings and specific details on its functioning in Yunohost (e.g. warning about integration issues)."
+            "doc/DESCRIPTION.md: a comprehensive presentation of the app, possibly listing the main features, possible warnings and specific details on its functioning in YunoHost (e.g. warning about integration issues)."
         ),
         validators=[DataRequired()],
         render_kw={
@@ -490,7 +484,7 @@ class Documentation(FlaskForm):
     )
     pre_install = TextAreaField(
         _(
-            "doc/PRE_INSTALL.md: important info to be shown to the admin before installing the app"
+            "doc/PRE_INSTALL.md: important info to be shown to the admin before installing the app."
         ),
         description=_("Leave empty if not relevant"),
         validators=[Optional()],
@@ -500,7 +494,7 @@ class Documentation(FlaskForm):
     )
     post_install = TextAreaField(
         _(
-            "doc/POST_INSTALL.md: important info to be shown to the admin after installing the app"
+            "doc/POST_INSTALL.md: important info to be shown to the admin after installing the app."
         ),
         description=_("Leave empty if not relevant"),
         validators=[Optional()],
@@ -510,7 +504,7 @@ class Documentation(FlaskForm):
     )
     pre_upgrade = TextAreaField(
         _(
-            "doc/PRE_UPGRADE.md: important info to be shown to the admin before upgrading the app"
+            "doc/PRE_UPGRADE.md: important info to be shown to the admin before upgrading the app."
         ),
         description=_("Leave empty if not relevant"),
         validators=[Optional()],
@@ -520,7 +514,7 @@ class Documentation(FlaskForm):
     )
     post_upgrade = TextAreaField(
         _(
-            "doc/POST_UPGRADE.md: important info to be shown to the admin after upgrading the app"
+            "doc/POST_UPGRADE.md: important info to be shown to the admin after upgrading the app."
         ),
         description=_("Leave empty if not relevant"),
         validators=[Optional()],
@@ -544,7 +538,7 @@ class MoreAdvanced(FlaskForm):
         _("Handle app install URL change (change_url script)"),
         default=True,
         render_kw={
-            "title": _("Should changing the app URL be allowed ? (change_url change)")
+            "title": _("Should changing the app URL be allowed? (change_url change)")
         },
     )
 
@@ -560,7 +554,7 @@ class MoreAdvanced(FlaskForm):
     # TODO : specify custom log file
     # custom_log_file = "/var/log/$app/$app.log" "/var/log/nginx/${domain}-error.log"
     use_fail2ban = BooleanField(
-        _("Protect the application against brute force attacks (via fail2ban)"),
+        _("Protect the application against brute force attacks (via Fail2Ban)"),
         default=False,
         render_kw={
             "title": _(
@@ -583,14 +577,14 @@ class MoreAdvanced(FlaskForm):
     )
 
     fail2ban_regex = StringField(
-        _("Regular expression for fail2ban"),
+        _("Regular expression for Fail2Ban"),
         # Regex to match into the log for a failed login
         validators=[Optional()],
         render_kw={
             "placeholder": _("A regular expression"),
             "class": "form-control",
             "title": _(
-                "Regular expression to check in the log file to activate failban (search for a line that indicates a credentials error)."
+                "Regular expression to check in the log file to activate FailBan (search for a line that indicates a credentials error)."
             ),
         },
     )
@@ -602,7 +596,7 @@ class GeneratorForm(
     IntegrationInfos,
     UpstreamInfos,
     InstallQuestions,
-    Ressources,
+    Resources,
     SpecificTechnology,
     AppConfig,
     Documentation,
@@ -637,6 +631,15 @@ class GeneratorForm(
         },
     )
 
+# SHA256 sum calculator
+def get_remote_sha256_sum(url):
+    remote = urllib.request.urlopen(url)
+    hash = hashlib.sha256()
+    while True:
+        data = remote.read(4096)
+        if not data: break
+        hash.update(data)
+    return hash.hexdigest()
 
 #### Web pages
 @app.route("/", methods=["GET", "POST"])
@@ -680,6 +683,7 @@ def main_form_route():
             AppFile("restore", "scripts/restore"),
             AppFile("upgrade", "scripts/upgrade"),
             AppFile("nginx", "conf/nginx.conf"),
+            AppFile("LICENSE", "LICENSE"),
         ]
 
         if main_form.enable_change_url.data:
@@ -711,9 +715,13 @@ def main_form_route():
             app_files.append(AppFile("ADMIN", "doc/ADMIN.md"))
 
         template_dir = os.path.dirname(__file__) + "/templates/"
+        
+        data = dict(request.form)
+        data["sha256sum"] = get_remote_sha256_sum(main_form.source_url.data)
+        
         for app_file in app_files:
             template = open(template_dir + app_file.id + ".j2").read()
-            app_file.content = render_template_string(template, data=dict(request.form))
+            app_file.content = render_template_string(template, data=data)
             app_file.content = re.sub(r"\n\s+$", "\n", app_file.content, flags=re.M)
             app_file.content = re.sub(r"\n{3,}", "\n\n", app_file.content, flags=re.M)
 
@@ -732,7 +740,7 @@ def main_form_route():
             f.seek(0)
             # Send the zip file to the user
             return send_file(
-                f, as_attachment=True, download_name=request.form["app_id"] + ".zip"
+                f, as_attachment=True, download_name=request.form["app_id"] + "_ynh.zip"
             )
 
     return render_template(
