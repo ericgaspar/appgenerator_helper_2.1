@@ -241,11 +241,11 @@
             {
                 if (document.getElementById("use_yarn").checked)
                 {
-                    install_snippet.value = "ynh_exec_as $app $ynh_node_load_PATH yarn install --production --pure-lockfile\nynh_exec_as $app $ynh_node_load_PATH yarn build";
+                    install_snippet.value = "ynh_exec_as_app yarn install --production --pure-lockfile\nynh_exec_as_app yarn build";
                 }
                 else
                 {
-                    install_snippet.value = "ynh_exec_as $app $ynh_node_load_PATH $ynh_npm install --production --ignore-scripts\nynh_exec_as $app $ynh_node_load_PATH $ynh_npm run build"
+                    install_snippet.value = "ynh_exec_as_app npm install --production --ignore-scripts\nynh_exec_as_app npm run build"
                 }
             }
             else if (main_technology.value == "python")
