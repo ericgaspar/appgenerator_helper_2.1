@@ -45,7 +45,7 @@ ynh_backup "$data_dir"
 ynh_backup "/etc/php/$php_version/fpm/pool.d/$app.conf"
 {% endif %}
 
-ynh_backup --src_path="/etc/nginx/conf.d/$domain.d/$app.conf"
+ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 {% if data.main_technology not in ["php", "none"] -%}
 ynh_backup "/etc/systemd/system/$app.service"
