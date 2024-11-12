@@ -51,6 +51,15 @@ ynh_script_progression "Stopping a systemd service..."
 ynh_systemctl --service="$app" --action="stop"
 {% endif %}
 
+{% if data.main_technology == "nodejs" -%}
+#=================================================
+# INSTALL DEPENDENCIES
+#=================================================
+ynh_script_progression "Installing dependencies..."
+
+ynh_nodejs_install
+{% endif %}
+
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================

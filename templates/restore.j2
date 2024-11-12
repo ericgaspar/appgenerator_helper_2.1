@@ -28,17 +28,29 @@ ynh_script_progression "Restoring the data directory..."
 ynh_restore "$data_dir"
 {% endif %}
 
+{% if data.main_technology == "nodejs" -%}
+#=================================================
+# REINSTALL DEPENDENCIES
+#=================================================
+ynh_script_progression "Reinstalling dependencies..."
+
+ynh_nodejs_install
+{% endif %}
+
 {% if data.database -%}
-#=================================================
-# RESTORE THE APP DATABASE
-#=================================================
 {% if data.datase == 'mysql' -%}
+#=================================================
+# RESTORE THE MYSQL DATABASE
+#=================================================
 ynh_script_progression "Restoring the MySQL database..."
 
 ynh_mysql_db_shell < ./db.sql
 {% endif %}
 
 {% if data.database == 'postgresql' -%}
+#=================================================
+# RESTORE THE POSTGRESQL DATABASE
+#=================================================
 ynh_script_progression "Restoring the PostgreSQL database..."
 
 ynh_psql_db_shell < ./db.sql
