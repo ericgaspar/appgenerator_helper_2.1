@@ -427,12 +427,24 @@ class SpecificTechnology(FlaskForm):
         },
     )
 
+    #
+    # Go
+    #
+
+    go_version = StringField(
+        _("Go version"),
+        description=_("For example: 1.20, 1.21, 1.22, 1.23..."),
+        render_kw={
+            "placeholder": "1.22",
+        },
+    )
+
     use_yarn = BooleanField(
         _("Install and use Yarn"),
         default=False,
     )
 
-    # NodeJS / Python / Ruby / ...
+    # NodeJS/Python/Ruby...
 
     systemd_execstart = StringField(
         _("Command to start the app daemon (from systemd service)"),
@@ -449,7 +461,7 @@ class AppConfig(FlaskForm):
 
     use_custom_config_file = BooleanField(
         _("The app uses a specific configuration file"),
-        description=_("Usually : .env, config.json, conf.ini, params.yml..."),
+        description=_("Usually: .env, config.json, conf.ini, params.yml..."),
         default=False,
     )
 

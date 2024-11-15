@@ -34,10 +34,14 @@ source /usr/share/yunohost/helpers
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
-{% if data.main_technology == "nodejs" -%}
-ynh_script_progression "Installing NodeJS..."
+ynh_script_progression "Installing dependencies..."
 
+{% if data.main_technology == "nodejs" -%}
 ynh_nodejs_install
+{% endif %}
+
+{% if data.main_technology == "go" -%}
+ynh_go_install
 {% endif %}
 
 #=================================================
