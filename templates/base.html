@@ -15,9 +15,17 @@
     {% endif %}
   </head>
   <body>
-      <main class="my-2 mx-auto max-w-screen-md">
+      <main class="my-2 mx-auto max-w-screen-lg">
         {% block main -%}
         {%- endblock main %}
       </main>
+
+      <footer class="h-5 my-5 text-center">
+        <p>
+          {{ _("Made with <i class='text-red-500 fa fa-heart-o' aria-label='love'></i> using <a class='text-blue-800' href='https://flask.palletsprojects.com'>Flask</a> and <a class='text-blue-800' href='https://tailwindcss.com/'>TailwindCSS</a>") }}
+          • <a class='text-blue-800' href='https://github.com/YunoHost/appgenerator'><i class='fa fa-code fa-fw' aria-hidden='true'></i> {{ _("Source") }}</a>
+          • Version {{ config["GENERATOR_VERSION"] }}
+        </p>
+      </footer>
   </body>
 </html>

@@ -185,9 +185,9 @@ ynh_script_progression "Finalizing installation..."
 ### web forms. We generally don't want to ask the final user,
 ### so we're going to use curl to automatically fill the fields and submit the
 ### forms.
-{% endif %}
 
-ynh_local_curl "/INSTALL_PATH" "key1=value1" "key2=value2" "key3=value3"
+# ynh_local_curl "/INSTALL_PATH" "key1=value1" "key2=value2" "key3=value3"
+{% endif %}
 
 {% if data.main_technology not in ["php", "none"] -%}
 #=================================================

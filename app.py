@@ -38,7 +38,7 @@ from wtforms.validators import (
     Length,
 )
 
-YOLOGEN_VERSION = "0.12"
+YOLOGEN_VERSION = "0.20"
 LANGUAGES = {"en": _("English"), "fr": _("French")}
 
 ###############################################################################
@@ -104,10 +104,10 @@ class GeneralInfos(FlaskForm):
 
     app_id = StringField(
         _("Application identifier (id)"),
-        description=_("Small caps and without spaces"),
+        description=_("This is the 'technical' name of the app. Lowercase, no space"),
         validators=[DataRequired(), Regexp(r"[a-z_1-9]+.*(?<!_ynh)$")],
         render_kw={
-            "placeholder": "my_super_app",
+            "placeholder": "my_awesome_app",
         },
     )
 
@@ -116,7 +116,7 @@ class GeneralInfos(FlaskForm):
         description=_("It's the application name, displayed in the user interface"),
         validators=[DataRequired()],
         render_kw={
-            "placeholder": "My super App",
+            "placeholder": "My Awesome App",
         },
     )
 
@@ -140,6 +140,7 @@ class IntegrationInfos(FlaskForm):
 
     version = StringField(
         _("Version"),
+        description=_("Corresponds to the upstream version that will be deployed. Typically this should match the URL of the source that you'll specify in section 5"),
         validators=[Regexp(r"\d{1,4}.\d{1,4}(.\d{1,4})?(.\d{1,4})?")],
         render_kw={"placeholder": "1.0"},
     )
@@ -196,11 +197,11 @@ class IntegrationInfos(FlaskForm):
             "Which means that people will be logged in the app after logging in YunoHost's portal, without having to sign on specifically into this app."
         ),
         choices=[
-            ("false", _("Yes")),
-            ("true", _("No")),
+            ("false", _("No")),
+            ("true", _("Yes")),
             ("not_relevant", _("Not relevant")),
         ],
-        default="not_relevant",
+        default="false",
         validators=[DataRequired()],
     )
 
@@ -260,8 +261,9 @@ class InstallQuestions(FlaskForm):
 
     domain_and_path = SelectField(
         _(
-            "Ask the URL where the app will be installed ('domain' and 'path' variables)"
+            "Ask the URL where the app will be installed"
         ),
+        description=_("Will correspond to the `$domain` and `$path` variables in scripts, and `__DOMAIN__` and `__PATH__` in configuration templates."),
         default="true",
         choices=[
             ("true", _("Ask domain+path")),
@@ -287,26 +289,6 @@ class InstallQuestions(FlaskForm):
         _("Ask who can access to the admin interface"),
         description=_("In the case where the app has an admin interface"),
         default=False,
-    )
-
-    language = SelectMultipleField(
-        _("Supported languages"),
-        choices=[
-            ("_", _("None / not relevant")),
-            ("en", _("English")),
-            ("fr", _("French")),
-            ("en", _("Spanish")),
-            ("it", _("Italian")),
-            ("de", _("German")),
-            ("zh", _("Chinese")),
-            ("jp", _("Japanese")),
-            ("da", _("Danish")),
-            ("pt", _("Portugese")),
-            ("nl", _("Dutch")),
-            ("ru", _("Russian")),
-        ],
-        default=["_"],
-        validators=[DataRequired()],
     )
 
 
@@ -346,7 +328,8 @@ class Resources(FlaskForm):
     )
 
     apt_dependencies = StringField(
-        _("Dependencies to be installed via apt (separated by comma and/or spaces)"),
+        _("Dependencies to be installed via apt"),
+        description=_("Separated by comma and/or spaces"),
         render_kw={
             "placeholder": "foo, bar2.1-ext, libwat",
         },
@@ -390,6 +373,7 @@ class SpecificTechnology(FlaskForm):
             ("nodejs", "NodeJS"),
             ("python", "Python"),
             ("ruby", "Ruby"),
+            ("go", "Go"),
             ("other", _("Other")),
         ],
         default="none",
@@ -460,13 +444,13 @@ class SpecificTechnology(FlaskForm):
 class AppConfig(FlaskForm):
 
     use_custom_config_file = BooleanField(
-        _("The app uses a specific configuration file"),
-        description=_("Usually: .env, config.json, conf.ini, params.yml..."),
+        _("Add a specific configuration file for the app"),
+        description=_("Typically: .env, config.json, conf.ini, params.yml..."),
         default=False,
     )
 
     custom_config_file = StringField(
-        _("Name or file path to use"),
+        _("App config filename"),
         validators=[Optional()],
         render_kw={
             "placeholder": "config.json",
@@ -474,12 +458,12 @@ class AppConfig(FlaskForm):
     )
 
     custom_config_file_content = TextAreaField(
-        _("App configuration file pattern"),
+        _("App config content"),
         description=_(
-            "In this pattern, you can use the syntax __FOO_BAR__ which will automatically replaced by the value of the variable $foo_bar"
+            "In this field, you can use the syntax __FOO_BAR__ which will automatically replaced by the value of the variable $foo_bar"
         ),
         validators=[Optional()],
-        render_kw={"spellcheck": "false"},
+        render_kw={"spellcheck": "false", "rows": "10"},
     )
 
 
@@ -487,18 +471,20 @@ class Documentation(FlaskForm):
     # TODO :    # screenshot
     description = TextAreaField(
         _(
-            "doc/DESCRIPTION.md: a comprehensive presentation of the app, possibly listing the main features, possible warnings and specific details on its functioning in YunoHost (e.g. warning about integration issues)."
+            "Comprehensive presentation"
         ),
+        description=_("Corresponds to 'doc/DESCRIPTION.md' and you can use markdown in there. Typically you should list the main features, possible warnings and specific details on its functioning in YunoHost (e.g. warning about integration issues)."),
         validators=[DataRequired()],
         render_kw={
             "spellcheck": "false",
+            "rows": "10",
         },
     )
     pre_install = TextAreaField(
         _(
-            "doc/PRE_INSTALL.md: important info to be shown to the admin before installing the app."
+            "Important info to be shown to the admin before installation"
         ),
-        description=_("Leave empty if not relevant"),
+        description=_("Corresponds to 'doc/PRE_INSTALL.md'") + " " + _("Leave empty if not relevant"),
         validators=[Optional()],
         render_kw={
             "spellcheck": "false",
@@ -506,9 +492,9 @@ class Documentation(FlaskForm):
     )
     post_install = TextAreaField(
         _(
-            "doc/POST_INSTALL.md: important info to be shown to the admin after installing the app."
+            "Important info to be shown to the admin after installation"
         ),
-        description=_("Leave empty if not relevant"),
+        description=_("Corresponds to 'doc/POST_INSTALL.md'") + " " + _("Leave empty if not relevant"),
         validators=[Optional()],
         render_kw={
             "spellcheck": "false",
@@ -516,9 +502,9 @@ class Documentation(FlaskForm):
     )
     pre_upgrade = TextAreaField(
         _(
-            "doc/PRE_UPGRADE.md: important info to be shown to the admin before upgrading the app."
+            "Important info to be shown to the admin before upgrade"
         ),
-        description=_("Leave empty if not relevant"),
+        description=_("Corresponds to 'doc/PRE_UPGRADE.md'") + " " + _("Leave empty if not relevant"),
         validators=[Optional()],
         render_kw={
             "spellcheck": "false",
@@ -526,17 +512,17 @@ class Documentation(FlaskForm):
     )
     post_upgrade = TextAreaField(
         _(
-            "doc/POST_UPGRADE.md: important info to be shown to the admin after upgrading the app."
+            "Important info to be shown to the admin after upgrade"
         ),
-        description=_("Leave empty if not relevant"),
+        description=_("Corresponds to 'doc/POST_UPGRADE.md'") + " " + _("Leave empty if not relevant"),
         validators=[Optional()],
         render_kw={
             "spellcheck": "false",
         },
     )
     admin = TextAreaField(
-        _("doc/ADMIN.md: general tips on how to administrate this app"),
-        description=_("Leave empty if not relevant"),
+        _("General tips on how to administrate this app"),
+        description=_("Corresponds to 'doc/ADMIN.md'.") + " " + _("Leave empty if not relevant"),
         validators=[Optional()],
         render_kw={
             "spellcheck": "false",
@@ -547,40 +533,30 @@ class Documentation(FlaskForm):
 class MoreAdvanced(FlaskForm):
 
     enable_change_url = BooleanField(
-        _("Handle app install URL change (change_url script)"),
+        _("Support URL change"),
+        description=_("Corresponds to the `change_url` script, allowing to change the domain/path where the app is exposed after installation"),
         default=True,
-        render_kw={
-            "title": _("Should changing the app URL be allowed? (change_url change)")
-        },
     )
 
     use_logrotate = BooleanField(
-        _("Use logrotate for the app logs"),
+        _("Use logrotate for the logs"),
         default=True,
-        render_kw={
-            "title": _(
-                "If the app generates logs, this option permit to handle their archival. Recommended."
-            )
-        },
     )
     # TODO : specify custom log file
     # custom_log_file = "/var/log/$app/$app.log" "/var/log/nginx/${domain}-error.log"
+
     use_fail2ban = BooleanField(
-        _("Protect the application against brute force attacks (via Fail2Ban)"),
+        _("Protect against brute force attacks"),
         default=False,
-        render_kw={
-            "title": _(
-                "If the app generates failed connexions logs, this option allows to automatically banish the related IP after a certain number of failed password tries. Recommended."
-            )
-        },
+        description=_("Use fail2ban, assuming the app logs failed connection attempts, this option allows to automatically ban suspicious IP after a number of failed attempts."),
     )
     use_cron = BooleanField(
-        _("Add a CRON task for this application"),
+        _("Configure a CRON task"),
         description=_("Corresponds to some app periodic operations"),
         default=False,
     )
     cron_config_file = TextAreaField(
-        _("Type the CRON file content"),
+        _("CRON file content"),
         validators=[Optional()],
         render_kw={
             "class": "form-control",
@@ -591,13 +567,11 @@ class MoreAdvanced(FlaskForm):
     fail2ban_regex = StringField(
         _("Regular expression for Fail2Ban"),
         # Regex to match into the log for a failed login
+        description=_("Regular expression to check in the log file to activate FailBan (search for a line that indicates a credentials error)."),
         validators=[Optional()],
         render_kw={
             "placeholder": _("A regular expression"),
             "class": "form-control",
-            "title": _(
-                "Regular expression to check in the log file to activate FailBan (search for a line that indicates a credentials error)."
-            ),
         },
     )
 

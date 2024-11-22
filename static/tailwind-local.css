@@ -13,7 +13,7 @@
     }
 
     h2 {
-        @apply text-xl font-medium;
+        @apply text-xl font-bold;
     }
     
     h3 {
@@ -40,11 +40,15 @@
         @apply bg-gray-400 hover:bg-gray-200;
     }
     .panel {
-        @apply block rounded-lg border border-gray-400 mb-2;
+        @apply block rounded-lg border border-gray-300 mb-5;
     }
     .panel-heading {
-        @apply text-white bg-blue-500 hover:bg-blue-600 px-2 py-1.5;
+        @apply text-blue-500 rounded-lg bg-gray-100 hover:bg-gray-200 px-2 py-1.5 cursor-pointer;
     }
+    .panel-heading > h2 {
+        @apply pl-3;
+    }
+
     .panel-body {
         @apply p-2;
     }
@@ -55,7 +59,6 @@
 
     .collapse-title:after {
         content: '\002B';
-        color: white;
         font-weight: bold;
         float: right;
         margin-right: 5px;
@@ -66,11 +69,11 @@
     }
 
     label {
-        @apply font-bold;
+        font-weight: 600;
     }
 
     .form-group, .checkbox {
-        @apply px-2 py-4;
+        @apply mb-3;
     }
 
     .form-control {

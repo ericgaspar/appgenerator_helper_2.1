@@ -13,13 +13,22 @@
 
 {% macro form_field(field) %}
 {% if field.widget.input_type == 'checkbox' %}
-    <div class="checkbox">
-      <label>
-        {{field()|safe}} {{field.label.text|safe}}
-      </label>
-      {%- if field.description -%}
+    <div class="checkbox flex">
+      <div class="w-4/12 px-4 mt-1 inline-block align-top">
+          <label for="{{ field.name }}">
+            {{field.label.text|safe}}
+          </label>
+      </div>
+      <div class="w-8/12 inline-block mt-3">
+        <label for="{{ field.name }}" class="inline-block relative mr-2 h-4 w-7 cursor-pointer">
+          <input type="checkbox" id="{{ field.name }}" class="peer sr-only" >
+          <span class="absolute inset-0 rounded-full bg-gray-300 transition peer-checked:bg-green-500"></span>
+          <span class="absolute inset-y-0 start-0 m-1 h-2 w-2 rounded-full bg-white transition-all peer-checked:start-3"></span>
+        </label>
+        {%- if field.description -%}
         <p class="help-block">{{field.description|safe}}</p>
-      {%- endif %}
+        {%- endif %}
+      </div>
     </div>
 {%- elif field.type == 'RadioField' -%}
     {% for item in field -%}
@@ -30,10 +39,13 @@
       </div>
     {% endfor %}
 {% else -%}
-  <div class="form-group {% if field.errors %} has-error{% endif -%}
+  <div class="flex form-group {% if field.errors %} has-error{% endif -%}
                          {%- if field.flags.required %} required{% endif -%}
   ">
+      <div class="w-4/12 px-4 mt-1 inline-block align-top">
       {{field.label(class="control-label")|safe}}
+      </div>
+      <div class="w-8/12 inline-block">
       {% if field.type == 'FileField' %}
         {{field(**kwargs)|safe}}
       {% else %}
@@ -47,6 +59,7 @@
       {%- elif field.description -%}
         <p class="help-block">{{field.description|safe}}</p>
       {%- endif %}
+      </div>
   </div>
 {% endif %}
 {% endmacro %}
@@ -59,7 +72,6 @@
     <h1 class="text-2xl font-bold">
         {{ _("YunoHost package generator") }} 
     </h1>
-    <p>Version: {{ config["GENERATOR_VERSION"] }}</p>
     <script>
     function changeLanguage(lang) {
         var url = "{{ url_for('set_lang', lang=lang) }}" + lang;
@@ -81,18 +93,21 @@
         {{ form_errors(main_form, hiddens="only") }}
     </div>
 
+    <div class="mb-5">
     {{ form_field(main_form.generator_mode) }}
+    </div>
 
     <div class="panel">
       <div class="panel-heading collapse-button">
-        <h2 class="panel-title collapse-title">{{ _("1/9 - General information") }}</h2>
+          <h2 class="panel-title collapse-title"><i class="fa fa-id-card-o" aria-hidden="true"></i> {{ _("General information") }} <small class="font-normal">(1/7)</small></h2>
       </div>
-      <div class="panel-body hide">
+      <div class="panel-body">
           <div>
             {{ form_field(main_form.app_name) }}
             {{ form_field(main_form.app_id) }}
             {{ form_field(main_form.description_en) }}
             {{ form_field(main_form.description_fr) }}
+            {{ form_field(main_form.description) }}
           </div>
       </div>
     </div>
@@ -100,9 +115,9 @@
 
     <div class="panel">
       <div class="panel-heading collapse-button">
-        <h2 class="panel-title collapse-title">{{ _("2/9 - Upstream information") }}</h2>
+          <h2 class="panel-title collapse-title"><i class="fa fa-map-signs" aria-hidden="true"></i> {{ _("Upstream information") }} <small class="font-normal">(2/7)</small></h2>
       </div>
-      <div class="panel-body hide">
+      <div class="panel-body">
           <p class="tip">{{ _("The word 'upstream' refers to the original project that develops and maintains the app") }}</p>
           <div>
             {{ form_field(main_form.license) }}
@@ -118,9 +133,9 @@
 
     <div class="panel">
       <div class="panel-heading collapse-button">
-        <h2 class="panel-title collapse-title">{{ _("3/9 - Integration in YunoHost") }}</h2>
+        <h2 class="panel-title collapse-title"><i class="fa fa-puzzle-piece " aria-hidden="true"></i> {{ _("Integration in YunoHost") }} <small class="font-normal">(3/7)</small></h2>
       </div>
-      <div class="panel-body hide">
+      <div class="panel-body">
           <div>
             {{ form_field(main_form.version) }}
             {{ form_field(main_form.maintainers) }}
@@ -134,9 +149,9 @@
 
     <div class="panel">
       <div class="panel-heading collapse-button">
-        <h2 class="panel-title collapse-title">{{ _("4/9 - Questions to ask during installation") }}</h2>
+        <h2 class="panel-title collapse-title"><i class="fa fa-question-circle-o" aria-hidden="true"></i>  {{ _("Questions to ask during installation") }} <small class="font-normal">(4/7)</small></h2>
       </div>
-      <div class="panel-body hide">
+      <div class="panel-body">
           <p class="tip">
               {{ _("This part is meant to indicate the questions that will be asked.") }}
               <br/>
@@ -147,28 +162,22 @@
             {{ form_field(main_form.domain_and_path) }}
             {{ form_field(main_form.init_main_permission) }}
             {{ form_field(main_form.init_admin_permission) }}
-            {{ form_field(main_form.language) }}
           </div>
       </div>
     </div>
 
     <div class="panel">
       <div class="panel-heading collapse-button">
-        <h2 class="panel-title collapse-title">{{ _("5/9 - Resources to initialize") }}</h2>
+          <h2 class="panel-title collapse-title"><i class="fa fa-cogs" aria-hidden="true"></i> {{ _("Resources to initialize") }} <small class="font-normal">(5/7)</small></h2>
       </div>
-      <div class="panel-body hide">
+      <div class="panel-body">
           <p class="tip">
               {{ _("Technical elements configured before launching the 'real' app install script. Usually: creating a system user, downloading app sources, initialiser le dossier d'install et de données, install apt dependencies, create a database...") }}
           </p>
 
-          <h3>Sources du logiciel</h3>
-          <div class="pl-2">
+          <div>
             {{ form_field(main_form.source_url) }}
             {{ form_field(main_form.auto_update) }}
-          </div>
-
-
-          <div>
             {{ form_field(main_form.system_user) }}
             {{ form_field(main_form.install_dir) }}
             {{ form_field(main_form.data_dir) }}
@@ -180,36 +189,44 @@
 
     <div class="panel">
       <div class="panel-heading collapse-button">
-        <h2 class="panel-title collapse-title">{{ _("6/9 - Specific technology") }}</h2>
+        <h2 class="panel-title collapse-title"><i class="fa fa-paper-plane" aria-hidden="true"></i> {{ _("App build and configuration") }} <small class="font-normal">(6/7)</small></h2>
       </div>
-      <div class="panel-body hide">
-            {{ form_field(main_form.main_technology) }}
-            <div id="php_options">
-                <div class="alert alert-info" role="alert"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> {{ _("You probably want to make sure to have 'phpX.Y-fpm' and others 'phpX.Y-foobar' libraries listed the apt dependencies earlier (with X.Y being the php version you want to use)") }}</div>
-                <div class="alert alert-info" role="alert"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> {{ _("The generated application draft will include an NGINX configuration snippet that interfaces with PHP-FPM") }}</div>
-                {{ form_field(main_form.use_composer) }}
-            </div>
-            <div id="nodejs_options">
-                {{ form_field(main_form.nodejs_version) }}
-                {{ form_field(main_form.use_yarn) }}
-            </div>
-            <div id="go_options">
-                {{ form_field(main_form.go_version) }}
-            </div>
-            <div id="python_options">
-                <div class="alert alert-info" role="alert"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> {{ _("You probably want to make sure to have 'python3' and 'python3-venv' listed in the apt dependencies earlier. Other dependencies should be installed inside a venv (cf the proposed install snippet)") }}</div>
-            </div>
-            {{ form_field(main_form.install_snippet) }}
-            <div id="systemd_options">
-                <div class="alert alert-info" role="alert"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> {{ _("The generated application draft will include an NGINX configuration snippet that reverse-proxies to a systemd service using an internal port") }}</div>
-                {{ form_field(main_form.systemd_execstart) }}
-            </div>
+      <div class="panel-body">
+          {{ form_field(main_form.main_technology) }}
+          <div id="php_options">
+              <div class="alert alert-info my-2" role="alert"><i class="fa fa-info-circle" aria-hidden="true"></i> {{ _("You probably want to make sure to have 'phpX.Y-fpm' and others 'phpX.Y-foobar' libraries listed the apt dependencies earlier (with X.Y being the php version you want to use)") }}</div>
+              <div class="alert alert-info my-2" role="alert"><i class="fa fa-info-circle" aria-hidden="true"></i> {{ _("The generated application draft will include an NGINX configuration snippet that interfaces with PHP-FPM") }}</div>
+              {{ form_field(main_form.use_composer) }}
+          </div>
+          <div id="nodejs_options">
+              {{ form_field(main_form.nodejs_version) }}
+              {{ form_field(main_form.use_yarn) }}
+          </div>
+          <div id="go_options">
+              {{ form_field(main_form.go_version) }}
+          </div>
+          <div id="python_options">
+              <div class="alert alert-info my-2" role="alert"><i class="fa fa-info-circle" aria-hidden="true"></i> {{ _("You probably want to make sure to have 'python3' and 'python3-venv' listed in the apt dependencies earlier. Other dependencies should be installed inside a venv (cf the proposed install snippet)") }}</div>
+          </div>
+          {{ form_field(main_form.install_snippet) }}
+          <div id="systemd_options">
+              <div class="alert alert-info my-2" role="alert"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> {{ _("The generated application draft will include an NGINX configuration snippet that reverse-proxies to a systemd service using an internal port") }}</div>
+              {{ form_field(main_form.systemd_execstart) }}
+              {{ form_field(main_form.use_logrotate) }}
+          </div>
+
+          {{ form_field(main_form.use_custom_config_file) }}
+          <div id="custom_config_file_options">
+             {{ form_field(main_form.custom_config_file) }}
+             {{ form_field(main_form.custom_config_file_content) }}
+          </div>
       </div>
       <script>
 
         let main_technology = document.getElementById("main_technology");
         let install_snippet = document.getElementById("install_snippet");
         let systemd_execstart = document.getElementById("systemd_execstart");
+        let use_custom_config_file = document.getElementById("use_custom_config_file");
 
         install_snippet.classList.add("font-mono");
         systemd_execstart.classList.add("font-mono");
@@ -220,6 +237,7 @@
             document.getElementById("nodejs_options").classList.add("hide");
             document.getElementById("python_options").classList.add("hide");
             document.getElementById("systemd_options").classList.add("hide");
+            document.getElementById("go_options").classList.add("hide");
             if (main_technology.value == "php") document.getElementById("php_options").classList.remove("hide");
             if (main_technology.value == "nodejs") document.getElementById("nodejs_options").classList.remove("hide");
             if (main_technology.value == "go") document.getElementById("go_options").classList.remove("hide");
@@ -265,62 +283,61 @@
                 install_snippet.value = "ynh_gem update --system --no-document\nynh_gem install bundler foreman --no-document\nbundle config set --local deployment 'true'\nbundle config set --local without 'development test'\nbundle install";
             }
         }
-        main_technology.addEventListener("change", update_main_technology);
-        document.getElementById("use_composer").addEventListener("change", update_main_technology);
-        document.getElementById("use_yarn").addEventListener("change", update_main_technology);
-        update_main_technology();
-      </script>
-    </div>
 
-    <div class="panel">
-      <div class="panel-heading collapse-button">
-        <h2 class="panel-title collapse-title">{{ _("7/9 - App configuration") }}</h2>
-      </div>
-      <div class="panel-body hide">
-            {{ form_field(main_form.use_custom_config_file) }}
-            <!-- TODO : this show/hide the other fields -->
-            <div id="custom_config_file_options">
-            {{ form_field(main_form.custom_config_file) }}
-            {{ form_field(main_form.custom_config_file_content) }}
-            </div>
-      </div>
-      <script>
-        let use_custom_config_file = document.getElementById("use_custom_config_file");
         function update_custom_config_file()
         {
             document.getElementById("custom_config_file_options").classList.add("hide");
             if (use_custom_config_file.checked) document.getElementById("custom_config_file_options").classList.remove("hide");
         }
+
+        main_technology.addEventListener("change", update_main_technology);
         use_custom_config_file.addEventListener("change", update_custom_config_file);
+        document.getElementById("use_composer").addEventListener("change", update_main_technology);
+        document.getElementById("use_yarn").addEventListener("change", update_main_technology);
+        update_main_technology();
         update_custom_config_file();
+
       </script>
     </div>
 
     <div class="panel">
       <div class="panel-heading collapse-button">
-        <h2 class="panel-title collapse-title">{{ _("8/9 - General and advanced documentation") }}</h2>
+        <h2 class="panel-title collapse-title"><i class="fa fa-tasks" aria-hidden="true"></i> {{ _("Advanced options") }} <small class="font-normal">(7/7)</small></h2>
       </div>
-      <div class="panel-body hide">
-          {{ form_field(main_form.description) }}
-          {{ form_field(main_form.pre_install) }}
-          {{ form_field(main_form.post_install) }}
-          {{ form_field(main_form.pre_upgrade) }}
-          {{ form_field(main_form.post_upgrade) }}
-          {{ form_field(main_form.admin) }}
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-heading collapse-button">
-        <h2 class="panel-title collapse-title">{{ _("9/9 - Advanced options") }}</h2>
-      </div>
-      <div class="panel-body hide">
+      <div class="panel-body">
             {{ form_field(main_form.enable_change_url) }}
-            {{ form_field(main_form.use_logrotate) }}
             {{ form_field(main_form.use_fail2ban) }}
+            <div id="fail2ban_options">
             {{ form_field(main_form.fail2ban_regex) }}
+            </div>
             {{ form_field(main_form.use_cron) }}
+            <div id="cron_options">
             {{ form_field(main_form.cron_config_file) }}
+            </div>
+            <script>
+                let use_cron = document.getElementById("use_cron");
+                let use_fail2ban = document.getElementById("use_fail2ban");
+                function update_cron()
+                {
+                    document.getElementById("cron_options").classList.add("hide");
+                    if (use_cron.checked) document.getElementById("cron_options").classList.remove("hide");
+                }
+                function update_fail2ban()
+                {
+                    document.getElementById("fail2ban_options").classList.add("hide");
+                    if (use_fail2ban.checked) document.getElementById("fail2ban_options").classList.remove("hide");
+                }
+                use_cron.addEventListener("change", update_cron);
+                use_fail2ban.addEventListener("change", update_fail2ban);
+                update_cron();
+                update_fail2ban();
+            </script>
+
+
+            <h3 class="mx-3 mt-3 mb-1 text-xl font-bold">{{ _("Additional documentation bits") }}</h3>
+            {{ form_field(main_form.admin) }}
+            {{ form_field(main_form.pre_install) }}
+            {{ form_field(main_form.post_install) }}
       </div>
     </div>
 
@@ -340,7 +357,7 @@
             document.getElementById('app_name').value = "Awesome demo app"
             document.getElementById('description_en').value = "Dummy app to demonstrate Yunohost app generator"
             document.getElementById('description_fr').value = "Application factice de démonstration du générateur d'application Yunohost"
-            document.getElementById('version').value = "1.0~ynh1"
+            document.getElementById('version').value = "1.0"
             document.getElementById('architectures').value = "all"
             // document.getElementById('ldap').value = "not_relevant"
             // document.getElementById('sso').value = "not_relevant"
@@ -362,7 +379,7 @@
       <div class="panel-heading collapse-button">
         <h3 class="panel-title collapse-title">{{ file.destination_path }}</h3>
       </div>
-      <div class="panel-body hide p-0">
+      <div class="panel-body p-0">
           <pre class="m-0">{{ file.content }}</pre>
       </div>
     </div>
