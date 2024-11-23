@@ -62,7 +62,7 @@ ram.runtime = "50M"
     # This won't be saved as setting and will instead be used to initialize the SSOwat permission
     {% endif -%}
     type = "group"
-    default = "visitors"
+    default = "{{ data.init_main_permission }}"
     {% endif %}
 
     {% if data.init_admin_permission -%}
