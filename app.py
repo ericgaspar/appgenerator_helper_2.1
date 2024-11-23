@@ -269,11 +269,15 @@ class InstallQuestions(FlaskForm):
         default="true",
         choices=[
             ("true", _("Ask domain and path")),
-            ("full_domain",_("Ask only the domain (the app requires to be installed at the root of a dedicated domain)")),
+            (
+                "full_domain",
+                _(
+                    "Ask only the domain (the app requires to be installed at the root of a dedicated domain)"
+                ),
+            ),
             ("false", _("Do not ask (it isn't a webapp)")),
         ],
     )
-
 
     init_main_permission = SelectField(
         _("Ask who can access to the app"),
@@ -293,6 +297,7 @@ class InstallQuestions(FlaskForm):
         description=_("In the case where the app has an admin interface"),
         default=False,
     )
+
 
 # manifest
 class Resources(FlaskForm):
