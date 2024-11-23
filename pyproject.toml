@@ -1,0 +1,58 @@
+[project]
+name = "appgenerator"
+version = "0.21"
+description = "The YunoHost App Generator"
+authors = [
+    {name = "YunoHost", email = "contrib@yunohost.org"},
+    {name = "Lapineige", email = "contrib@yunohost.org"},
+]
+dependencies = [
+    "Babel==2.16.0",
+    "blinker==1.8.2",
+    "click==8.1.7",
+    "Flask==3.0.3",
+    "flask-babel==4.0.0",
+    "Flask-WTF==1.2.1",
+    "gunicorn==23.0.0",
+    "itsdangerous==2.2.0",
+    "Jinja2==3.1.4",
+    "MarkupSafe==2.1.5",
+    "packaging==24.1",
+    "pytz==2024.2",
+    "Werkzeug==3.0.4",
+    "WTForms==3.1.2",
+]
+requires-python = ">=3.9"
+readme = "README.md"
+license = {text = "AGPL-3.0"}
+
+
+[tool.pdm]
+distribution = false
+
+[tool.pdm.scripts]
+
+start.shell = "FLASK_ENV=development flask -A app.py --debug run"
+
+fetch_assets.shell = "cd static && ./fetch_assets"
+
+## For translation
+
+# Extract the english sentences from the code, needed if you modified it
+translation_extract = "pybabel extract --ignore-dirs venv -F babel.cfg -o messages.pot ."
+
+# Update the existing .po:
+translation_update = "pybabel update -i messages.pot -d translations"
+
+# ... translate stuff in translations/<lang>/LC_MESSAGES/messages.po
+# re-run the 'update' command to let Babel properly format the text
+# then compile:
+translation_compile = "pybabel compile -d translations"
+
+update_translations.composite = [
+    "translation_extract", "translation_update", "translation_compile"
+]
+
+# If working on a new locale: initialize it (in this example: fr)
+# needs to be run like `pdm run translation_create fr`
+translation_create = "pybabel init -i messages.pot -d translations -l"
