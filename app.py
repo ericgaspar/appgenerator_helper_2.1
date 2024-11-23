@@ -140,7 +140,9 @@ class IntegrationInfos(FlaskForm):
 
     version = StringField(
         _("Version"),
-        description=_("Corresponds to the upstream version that will be deployed. Typically this should match the URL of the source that you'll specify in section 5"),
+        description=_(
+            "Corresponds to the upstream version that will be deployed. Typically this should match the URL of the source that you'll specify in section 5"
+        ),
         validators=[Regexp(r"\d{1,4}.\d{1,4}(.\d{1,4})?(.\d{1,4})?")],
         render_kw={"placeholder": "1.0"},
     )
@@ -260,10 +262,10 @@ class UpstreamInfos(FlaskForm):
 class InstallQuestions(FlaskForm):
 
     domain_and_path = SelectField(
-        _(
-            "Ask the URL where the app will be installed"
+        _("Ask the URL where the app will be installed"),
+        description=_(
+            "Will correspond to the `$domain` and `$path` variables in scripts, and `__DOMAIN__` and `__PATH__` in configuration templates."
         ),
-        description=_("Will correspond to the `$domain` and `$path` variables in scripts, and `__DOMAIN__` and `__PATH__` in configuration templates."),
         default="true",
         choices=[
             ("true", _("Ask domain+path")),
@@ -470,10 +472,10 @@ class AppConfig(FlaskForm):
 class Documentation(FlaskForm):
     # TODO :    # screenshot
     description = TextAreaField(
-        _(
-            "Comprehensive presentation"
+        _("Comprehensive presentation"),
+        description=_(
+            "Corresponds to 'doc/DESCRIPTION.md' and you can use markdown in there. Typically you should list the main features, possible warnings and specific details on its functioning in YunoHost (e.g. warning about integration issues)."
         ),
-        description=_("Corresponds to 'doc/DESCRIPTION.md' and you can use markdown in there. Typically you should list the main features, possible warnings and specific details on its functioning in YunoHost (e.g. warning about integration issues)."),
         validators=[DataRequired()],
         render_kw={
             "spellcheck": "false",
@@ -481,40 +483,40 @@ class Documentation(FlaskForm):
         },
     )
     pre_install = TextAreaField(
-        _(
-            "Important info to be shown to the admin before installation"
-        ),
-        description=_("Corresponds to 'doc/PRE_INSTALL.md'") + " " + _("Leave empty if not relevant"),
+        _("Important info to be shown to the admin before installation"),
+        description=_("Corresponds to 'doc/PRE_INSTALL.md'")
+        + " "
+        + _("Leave empty if not relevant"),
         validators=[Optional()],
         render_kw={
             "spellcheck": "false",
         },
     )
     post_install = TextAreaField(
-        _(
-            "Important info to be shown to the admin after installation"
-        ),
-        description=_("Corresponds to 'doc/POST_INSTALL.md'") + " " + _("Leave empty if not relevant"),
+        _("Important info to be shown to the admin after installation"),
+        description=_("Corresponds to 'doc/POST_INSTALL.md'")
+        + " "
+        + _("Leave empty if not relevant"),
         validators=[Optional()],
         render_kw={
             "spellcheck": "false",
         },
     )
     pre_upgrade = TextAreaField(
-        _(
-            "Important info to be shown to the admin before upgrade"
-        ),
-        description=_("Corresponds to 'doc/PRE_UPGRADE.md'") + " " + _("Leave empty if not relevant"),
+        _("Important info to be shown to the admin before upgrade"),
+        description=_("Corresponds to 'doc/PRE_UPGRADE.md'")
+        + " "
+        + _("Leave empty if not relevant"),
         validators=[Optional()],
         render_kw={
             "spellcheck": "false",
         },
     )
     post_upgrade = TextAreaField(
-        _(
-            "Important info to be shown to the admin after upgrade"
-        ),
-        description=_("Corresponds to 'doc/POST_UPGRADE.md'") + " " + _("Leave empty if not relevant"),
+        _("Important info to be shown to the admin after upgrade"),
+        description=_("Corresponds to 'doc/POST_UPGRADE.md'")
+        + " "
+        + _("Leave empty if not relevant"),
         validators=[Optional()],
         render_kw={
             "spellcheck": "false",
@@ -522,7 +524,9 @@ class Documentation(FlaskForm):
     )
     admin = TextAreaField(
         _("General tips on how to administrate this app"),
-        description=_("Corresponds to 'doc/ADMIN.md'.") + " " + _("Leave empty if not relevant"),
+        description=_("Corresponds to 'doc/ADMIN.md'.")
+        + " "
+        + _("Leave empty if not relevant"),
         validators=[Optional()],
         render_kw={
             "spellcheck": "false",
@@ -534,7 +538,9 @@ class MoreAdvanced(FlaskForm):
 
     enable_change_url = BooleanField(
         _("Support URL change"),
-        description=_("Corresponds to the `change_url` script, allowing to change the domain/path where the app is exposed after installation"),
+        description=_(
+            "Corresponds to the `change_url` script, allowing to change the domain/path where the app is exposed after installation"
+        ),
         default=True,
     )
 
@@ -548,7 +554,9 @@ class MoreAdvanced(FlaskForm):
     use_fail2ban = BooleanField(
         _("Protect against brute force attacks"),
         default=False,
-        description=_("Use fail2ban, assuming the app logs failed connection attempts, this option allows to automatically ban suspicious IP after a number of failed attempts."),
+        description=_(
+            "Use fail2ban, assuming the app logs failed connection attempts, this option allows to automatically ban suspicious IP after a number of failed attempts."
+        ),
     )
     use_cron = BooleanField(
         _("Configure a CRON task"),
@@ -567,7 +575,9 @@ class MoreAdvanced(FlaskForm):
     fail2ban_regex = StringField(
         _("Regular expression for Fail2Ban"),
         # Regex to match into the log for a failed login
-        description=_("Regular expression to check in the log file to activate FailBan (search for a line that indicates a credentials error)."),
+        description=_(
+            "Regular expression to check in the log file to activate FailBan (search for a line that indicates a credentials error)."
+        ),
         validators=[Optional()],
         render_kw={
             "placeholder": _("A regular expression"),
