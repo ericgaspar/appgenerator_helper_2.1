@@ -165,9 +165,9 @@ class IntegrationInfos(FlaskForm):
         choices=[
             ("all", _("All architectures")),
             ("amd64", "amd64"),
-            ("i386", "i386"),
-            ("armhf", "armhf"),
             ("arm64", "arm64"),
+            ("armhf", "armhf"),
+            ("i386", "i386"),
         ],
         default=["all"],
         validators=[DataRequired()],
@@ -268,13 +268,8 @@ class InstallQuestions(FlaskForm):
         ),
         default="true",
         choices=[
-            ("true", _("Ask domain+path")),
-            (
-                "full_domain",
-                _(
-                    "Ask only the domain (the app requires to be installed at the root of a dedicated domain)"
-                ),
-            ),
+            ("true", _("Ask domain and path")),
+            ("full_domain",_("Ask only the domain (the app requires to be installed at the root of a dedicated domain)")),
             ("false", _("Do not ask (it isn't a webapp)")),
         ],
     )
