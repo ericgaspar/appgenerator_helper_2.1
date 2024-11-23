@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 
 import hashlib
+import importlib
 import logging
 import os
 import random
 import re
 import string
+import tomllib
 import urllib.request
 import zipfile
 from io import BytesIO
+from pathlib import Path
 
 from flask import (Flask, make_response, redirect, render_template,
                    render_template_string, request, send_file, session)
@@ -20,7 +23,16 @@ from wtforms import (BooleanField, HiddenField, SelectField,
                      TextAreaField)
 from wtforms.validators import URL, DataRequired, Length, Optional, Regexp
 
-YOLOGEN_VERSION = "0.20"
+
+def get_version():
+    source_location = Path(__file__).parent
+    if (pyproject := (source_location / "pyproject.toml")).exists():
+        return tomllib.loads(pyproject.read_text())['project']['version']
+    else:
+        return importlib.metadata.version("package")
+
+
+__version__ = get_version()
 LANGUAGES = {"en": _("English"), "fr": _("French")}
 
 ###############################################################################
