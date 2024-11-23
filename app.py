@@ -277,12 +277,18 @@ class InstallQuestions(FlaskForm):
         ],
     )
 
-    init_main_permission = BooleanField(
+
+    init_main_permission = SelectField(
         _("Ask who can access to the app"),
         description=_(
             "In the users groups: by default at least 'visitors', 'all_users' et 'admins' exists."
         ),
-        default=True,
+        default="visitors",
+        choices=[
+            ("visitors", "Visitors"),
+            ("all_users", "All instance users"),
+            ("admins", "Only instance Administrator"),
+        ],
     )
 
     init_admin_permission = BooleanField(
@@ -290,7 +296,6 @@ class InstallQuestions(FlaskForm):
         description=_("In the case where the app has an admin interface"),
         default=False,
     )
-
 
 # manifest
 class Resources(FlaskForm):
