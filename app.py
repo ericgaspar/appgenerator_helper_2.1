@@ -1,44 +1,24 @@
 #!/usr/bin/env python3
 
-import re
-import os
 import hashlib
-import urllib.request
 import logging
-import zipfile
+import os
 import random
+import re
 import string
+import urllib.request
+import zipfile
 from io import BytesIO
-from flask import (
-    Flask,
-    render_template,
-    render_template_string,
-    request,
-    redirect,
-    send_file,
-    make_response,
-    session,
-)
 
+from flask import (Flask, make_response, redirect, render_template,
+                   render_template_string, request, send_file, session)
+from flask_babel import Babel
+from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from flask_babel import Babel, lazy_gettext as _
-
-from wtforms import (
-    StringField,
-    SelectField,
-    SubmitField,
-    TextAreaField,
-    BooleanField,
-    SelectMultipleField,
-    HiddenField,
-)
-from wtforms.validators import (
-    DataRequired,
-    Optional,
-    Regexp,
-    URL,
-    Length,
-)
+from wtforms import (BooleanField, HiddenField, SelectField,
+                     SelectMultipleField, StringField, SubmitField,
+                     TextAreaField)
+from wtforms.validators import URL, DataRequired, Length, Optional, Regexp
 
 YOLOGEN_VERSION = "0.20"
 LANGUAGES = {"en": _("English"), "fr": _("French")}
