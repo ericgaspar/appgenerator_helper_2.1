@@ -40,10 +40,10 @@ fetch_assets.shell = "cd static && ./fetch_assets"
 ## For translation
 
 # Extract the english sentences from the code, needed if you modified it
-translation_extract = "pybabel extract --ignore-dirs venv -F babel.cfg -o messages.pot ."
+translation_extract = "pybabel extract --ignore-dirs venv -F babel.cfg -o translations/messages.pot ."
 
 # Update the existing .po:
-translation_update = "pybabel update -i messages.pot -d translations"
+translation_update = "pybabel update -i translations/messages.pot -d translations"
 
 # ... translate stuff in translations/<lang>/LC_MESSAGES/messages.po
 # re-run the 'update' command to let Babel properly format the text
@@ -56,4 +56,4 @@ update_translations.composite = [
 
 # If working on a new locale: initialize it (in this example: fr)
 # needs to be run like `pdm run translation_create fr`
-translation_create = "pybabel init -i messages.pot -d translations -l"
+translation_create = "pybabel init -i translations/messages.pot -d translations -l"
