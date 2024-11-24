@@ -47,7 +47,7 @@ if app.config.get("DEBUG"):
     app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 app.config["LANGUAGES"] = LANGUAGES
-app.config["GENERATOR_VERSION"] = YOLOGEN_VERSION
+app.config["GENERATOR_VERSION"] = __version__
 
 # This is the secret key used for session signing
 app.secret_key = "".join(random.choice(string.ascii_lowercase) for i in range(32))
