@@ -560,7 +560,7 @@ class MoreAdvanced(FlaskForm):
         _("Protect against brute force attacks"),
         default=False,
         description=_(
-            "Use fail2ban, assuming the app logs failed connection attempts, this option allows to automatically ban suspicious IP after a number of failed attempts."
+            "Use Fail2Ban, assuming the app logs failed connection attempts, this option allows to automatically ban suspicious IP after a number of failed attempts."
         ),
     )
     use_cron = BooleanField(
@@ -616,7 +616,7 @@ class GeneratorForm(
             ("simple", _("Streamlined version")),
             ("tutorial", _("Tutorial version")),
         ],
-        default="true",
+        default="simple",
         validators=[DataRequired()],
     )
 
