@@ -293,7 +293,7 @@ class InstallQuestions(FlaskForm):
     )
 
 
-# manifest
+# Manifest
 class Resources(FlaskForm):
 
     # Sources
