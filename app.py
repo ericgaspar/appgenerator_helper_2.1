@@ -190,7 +190,7 @@ class IntegrationInfos(FlaskForm):
             ("true", _("Yes")),
             ("not_relevant", _("Not relevant")),
         ],
-        default="not_relevant",
+        default="false",
         validators=[DataRequired()],
     )
     sso = SelectField(
