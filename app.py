@@ -126,7 +126,6 @@ class GeneralInfos(FlaskForm):
         description=_(
             "Explain in a few words (10-15) why this app is useful or what it does (the goal is to give a broad idea for the user browsing an hundred apps long catalog"
         ),
-        validators=[DataRequired()],
     )
 
 
@@ -629,12 +628,18 @@ class GeneratorForm(
 
 # SHA256 sum calculator
 def get_remote_sha256_sum(url):
+    limit_download_bytes = 100 * 1024**2 # 100 Mb
+    chunk_size = 4096
     remote = urllib.request.urlopen(url)
     hash = hashlib.sha256()
+    downloaded_bytes = 0
     while True:
-        data = remote.read(4096)
+        data = remote.read(chunk_size)
+        downloaded_bytes += chunk_size
         if not data:
             break
+        if downloaded_bytes > limit_download_bytes:
+            return "!!! Sorry, resource too large to compute checksum, please do that yourself"
         hash.update(data)
     return hash.hexdigest()
 
@@ -682,6 +687,7 @@ def main_form_route():
             AppFile("upgrade", "scripts/upgrade"),
             AppFile("nginx", "conf/nginx.conf"),
             AppFile("LICENSE", "LICENSE"),
+            AppFile("editorconfig", ".editorconfig"),
         ]
 
         if main_form.enable_change_url.data:
