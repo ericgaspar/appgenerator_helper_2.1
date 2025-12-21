@@ -13,21 +13,35 @@ import zipfile
 from io import BytesIO
 from pathlib import Path
 
-from flask import (Flask, make_response, redirect, render_template,
-                   render_template_string, request, send_file, session)
+from flask import (
+    Flask,
+    make_response,
+    redirect,
+    render_template,
+    render_template_string,
+    request,
+    send_file,
+    session,
+)
 from flask_babel import Babel
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import (BooleanField, HiddenField, SelectField,
-                     SelectMultipleField, StringField, SubmitField,
-                     TextAreaField)
+from wtforms import (
+    BooleanField,
+    HiddenField,
+    SelectField,
+    SelectMultipleField,
+    StringField,
+    SubmitField,
+    TextAreaField,
+)
 from wtforms.validators import URL, DataRequired, Length, Optional, Regexp
 
 
 def get_version():
     source_location = Path(__file__).parent
     if (pyproject := (source_location / "pyproject.toml")).exists():
-        return tomllib.loads(pyproject.read_text())['project']['version']
+        return tomllib.loads(pyproject.read_text())["project"]["version"]
     else:
         return importlib.metadata.version("package")
 
@@ -628,7 +642,7 @@ class GeneratorForm(
 
 # SHA256 sum calculator
 def get_remote_sha256_sum(url):
-    limit_download_bytes = 100 * 1024**2 # 100 Mb
+    limit_download_bytes = 100 * 1024**2  # 100 Mb
     chunk_size = 4096
     remote = urllib.request.urlopen(url)
     hash = hashlib.sha256()
